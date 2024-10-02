@@ -17,7 +17,7 @@ function startScanning() {
                         (decodedText, decodedResult) => {
                             if (!isBarcodeDetected) {
                                 // Display scanned result without any prefix
-                                document.getElementById("result").value = decodedText; // Set the input value
+                                document.getElementById("barcode").value = decodedText; // Set the input value
                                 isBarcodeDetected = true; // Set flag to indicate barcode has been detected
                                 stopScanning();
                             }
@@ -88,7 +88,7 @@ document.getElementById("imageInput").addEventListener("change", function () {
             .scanFile(imageFile, false) // Pass the image file directly
             .then((decodedText) => {
                 // Set the input value with the scanned text
-                document.getElementById("result").value = decodedText; 
+                document.getElementById("barcode").value = decodedText; 
                 isBarcodeDetected = true; // Set flag for barcode detection
 
                 // Send the scanned text to the server
@@ -97,7 +97,7 @@ document.getElementById("imageInput").addEventListener("change", function () {
             .catch((err) => {
                 console.error("Error scanning image: ", err);
                 // Set the input value to "Invalid barcode"
-                document.getElementById("result").value = "Invalid barcode.";
+                document.getElementById("barcode").value = "Invalid barcode.";
             });
     } else {
         alert("Please select an image file.");
@@ -109,7 +109,7 @@ function resetState() {
     isScanning = false;
     isBarcodeDetected = false;
     document.getElementById("startButton").innerText = "Start Scanning";
-    document.getElementById("result").value = ""; // Clear previous results
+    document.getElementById("barcode").value = ""; // Clear previous results
 }
 
 // Example function to send the result to the server
