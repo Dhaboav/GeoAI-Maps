@@ -36,6 +36,8 @@ async function initMap() {
 function setUpEventListeners() {
     document.getElementById("add-marker").addEventListener("click", toggleMarkerAddMode);
     document.getElementById("close-store-form").addEventListener("click", deactivateMarkerAddMode);
+    document.getElementById("show-all").addEventListener("click", () => toggleMarkers(true));
+    document.getElementById("hide-all").addEventListener("click", () => toggleMarkers(false));
     document.addEventListener("markerAdded", handleMarkerEvent("markerAdded"));
     document.addEventListener("markerUpdated", handleMarkerEvent("markerUpdated"));
     document.addEventListener("markerDeleted", handleMarkerEvent("markerDeleted"));
@@ -197,4 +199,10 @@ function deleteMarker(markerId) {
     dispatchMarkerEvent("markerDeleted", { markerId });
 }
 
+// Function to toggle markers visibility
+function toggleMarkers(shouldShow) {
+    markers.forEach(({ marker }) => {
+        marker.setMap(shouldShow ? map : null); // Show or hide each marker
+    });
+}
 initMap();
