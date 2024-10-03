@@ -163,8 +163,8 @@
             </form>
          </div>
       </div>
-   </div>
-   <!-- Scanner end-->
+   </div> 
+   <!-- Scanner end -->
 
    <!-- Add palace form begin -->
    <div id="drawer-bottom-example" class="fixed bottom-0 left-0 z-40 md:max-w-80 p-4 overflow-y-auto  bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="drawer-bottom-label">
