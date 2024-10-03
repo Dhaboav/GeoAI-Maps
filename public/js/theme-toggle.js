@@ -1,23 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
     const toggle = document.getElementById('dark-toggle');
 
-    // Set initial state based on localStorage or media query
-    if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-        document.documentElement.classList.add("dark");
-        toggle.checked = true; 
-    } else {
-        document.documentElement.classList.remove("dark");
-        toggle.checked = false;
+    // Helper function to apply theme
+    function applyTheme(isDark) {
+        document.documentElement.classList.toggle("dark", isDark);
+        toggle.checked = isDark;
+        localStorage.theme = isDark ? "dark" : "light";
     }
 
-    // Add event listener for toggle
+    // Determine initial theme state
+    function getInitialTheme() {
+        return localStorage.theme === "dark" || 
+            (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    }
+
+    // Set initial state
+    applyTheme(getInitialTheme());
+
+    // Event listener for toggle
     toggle.addEventListener('change', () => {
-        if (toggle.checked) {
-            document.documentElement.classList.add("dark");
-            localStorage.theme = "dark";
-        } else {
-            document.documentElement.classList.remove("dark");
-            localStorage.theme = "light"; 
-        }
+        applyTheme(toggle.checked);
     });
 });
