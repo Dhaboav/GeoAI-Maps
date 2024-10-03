@@ -4,6 +4,7 @@
 <head>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta name="csrf-token" content="{{ csrf_token() }}">
    @vite(['resources/css/app.css', 'resources/js/app.js'])
    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
@@ -177,7 +178,8 @@
          </svg>
          <span class="sr-only">Close menu</span>
       </button>
-      <form class="mb-6">
+      <form id="store-form" action="{{ url('api/store') }}" method="POST" class="mb-6">
+         @csrf
          <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
                <label for="store-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Store name</label>
@@ -224,11 +226,14 @@
    <!-- Footer end -->
 
    <!-- Javascript begin -->
+   <script src="{{ asset('js/api-key.js') }}"></script>
+   <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+      ({key: API_KEY, v: "weekly"});</script>
+
    <script src="{{ asset('js/barcode-scanner.js') }}"></script>
    <script src="{{ asset('js/theme-toggle.js') }}"></script>
-   <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-      ({key: "{{ env('GOOGLE_MAPS_API_KEY') }}", v: "weekly"});</script>
    <script src="{{ asset('js/map-init.js') }}"></script>
+   <script src="{{ asset('js/store-form.js') }}"></script>
    <!-- Javascript end -->
    
 </body>
