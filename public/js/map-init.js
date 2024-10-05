@@ -1,12 +1,12 @@
 let map;
+let markers = [];
+let markerWindow;
 let currentMarker = null;
 let markerListener = null;
 let markerAddMode = false;
-let markers = [];
-let markerWindow;
 const BASE_URL = `${window.location.origin}`;
 
-// Initialize the map
+// Initialization Functions
 async function initMap() {
     const position = { lat: -0.05572, lng: 109.3485 };
     const { Map } = await google.maps.importLibrary("maps");
@@ -28,52 +28,30 @@ async function initMap() {
     markerWindow = new google.maps.InfoWindow();
     await loadMarkers(); // Load initial markers
 
-    // Add event listeners for marker actions
     setUpEventListeners();
 }
 
-// Set up event listeners
 function setUpEventListeners() {
     document.getElementById("add-marker").addEventListener("click", toggleMarkerAddMode);
     document.getElementById("close-store-form").addEventListener("click", deactivateMarkerAddMode);
     document.getElementById("show-all").addEventListener("click", () => toggleMarkers(true));
     document.getElementById("hide-all").addEventListener("click", () => toggleMarkers(false));
-    document.addEventListener("markerAdded", handleMarkerEvent("markerAdded"));
-    document.addEventListener("markerUpdated", handleMarkerEvent("markerUpdated"));
-    document.addEventListener("markerDeleted", handleMarkerEvent("markerDeleted"));
+    
+    ["markerAdded", "markerUpdated", "markerDeleted"].forEach(eventType => {
+        document.addEventListener(eventType, handleMarkerEvent(eventType));
+    });
 }
 
-function handleMarkerEvent(eventType) {
-    return (event) => {
-        if (eventType === "markerDeleted") {
-            const { markerId } = event.detail;
-            console.log(`Deleted marker ID: ${markerId}`);
-            
-            // Find the marker by ID and remove it from the map
-            const markerIndex = markers.findIndex(markerObj => markerObj.id === Number(markerId));
-            if (markerIndex !== -1) {
-                markers[markerIndex].marker.setMap(null); // Remove the marker from the map
-                markers.splice(markerIndex, 1); // Remove the marker from the array
-            }
-        } else {
-            loadMarkers(); // Reload markers after the respective event
-        }
-    };
-}
-
-
-// Fetch markers from the API and update the map
+// Marker Management Functions
 async function loadMarkers() {
     const markersData = await fetchMarkers();
     clearMarkers(); // Clear existing markers
     markersData.forEach(addMarkerToMap); // Add new markers
 }
 
-// Fetch markers from the API
 async function fetchMarkers() {
     try {
-        const url = `${BASE_URL}/api/store`;
-        const response = await fetch(url);
+        const response = await fetch(`${BASE_URL}/api/store`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
         const result = await response.json();
@@ -89,17 +67,14 @@ async function fetchMarkers() {
     }
 }
 
-// Add markers to the map
 function addMarkerToMap(markerData) {
     const position = new google.maps.LatLng(markerData.latitude, markerData.longitude);
-    const blueDotIcon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-    const marker = createMarker(position, markerData.nama_toko, blueDotIcon);
+    const marker = createMarker(position, markerData.nama_toko, "https://maps.google.com/mapfiles/ms/icons/blue-dot.png");
 
     markers.push({ id: markerData.id_toko, marker, position });
     marker.addListener("click", () => openMarkerWindow(marker, markerData));
 }
 
-// Create a marker
 function createMarker(position, title, iconSrc) {
     const markerImage = document.createElement("img");
     markerImage.src = iconSrc;
@@ -112,6 +87,95 @@ function createMarker(position, title, iconSrc) {
     });
 }
 
+function clearMarkers() {
+    markers.forEach(({ marker }) => marker.setMap(null));  // Remove each marker from the map
+    markers = [];  // Clear the markers array
+}
+
+function placeTemporaryMarker(latLng) {
+    clearTemporaryMarker(); // Clear any existing temp marker
+    currentMarker = createMarker(latLng, "Temp Marker", "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png");
+}
+
+// Temporary Marker Management
+function clearTemporaryMarker() {
+    if (currentMarker) {
+        currentMarker.setMap(null);
+        currentMarker = null;
+    }
+}
+
+// Event Handling Functions
+function handleMarkerEvent(eventType) {
+    return (event) => {
+        if (eventType === "markerDeleted") {
+            const { markerId } = event.detail;
+            console.log(`Deleted marker ID: ${markerId}`);
+            removeMarkerById(markerId);
+        } else {
+            loadMarkers(); // Reload markers after add/update event
+        }
+    };
+}
+
+function removeMarkerById(markerId) {
+    const markerIndex = markers.findIndex(markerObj => markerObj.id === Number(markerId));
+    if (markerIndex !== -1) {
+        markers[markerIndex].marker.setMap(null); // Remove the marker from the map
+        markers.splice(markerIndex, 1); // Remove the marker from the array
+    }
+}
+
+// CRUD Functions
+function confirmDelete(markerId) {
+    if (confirm("Are you sure you want to delete this marker?")) {
+        deleteMarker(markerId);
+    }
+}
+
+function deleteMarker(markerId) {
+    const markerData = markers.find(m => m.id === Number(markerId));
+    if (markerData) {
+        const { lat, lng } = markerData.position;
+
+        // Remove marker from the map
+        markerData.marker.setMap(null);
+        markers = markers.filter(m => m.id !== markerId);
+        
+        // Trigger the API call to delete the store
+        fetch(`${BASE_URL}/api/store/${markerId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 200) {
+                    alert(data.message);
+                    dispatchMarkerEvent("markerDeleted", { lat, lng, markerId });
+                } else {
+                    console.error(`Failed to delete store with ID ${markerId}: ${data.message}`);
+                    alert(`Failed to delete store: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting store. Please try again.');
+            });
+    } else {
+        console.error(`Marker with ID ${markerId} not found.`);
+        alert('Marker not found.');
+    }
+}
+
+function dispatchMarkerEvent(eventType, position) {
+    const markerEvent = new CustomEvent(eventType, {
+        detail: { 
+            lat: position.lat(),
+            lng: position.lng(),
+            markerId: position.markerId 
+        },
+    });
+    document.dispatchEvent(markerEvent);
+}
+
+// Info Window Functions
 function generateMarkerContent(markerData) {
     return `
     <div class="marker-container">
@@ -121,37 +185,25 @@ function generateMarkerContent(markerData) {
     </div>`;
 }
 
-// Confirmation for deletion
-function confirmDelete(markerId) {
-    const confirmed = confirm("Are you sure you want to delete this marker?");
-    if (confirmed) {
-        deleteMarker(markerId);
-    }
-}
-
-// Open the marker window with given data
 function openMarkerWindow(marker, markerData) {
     markerWindow.setContent(generateMarkerContent(markerData));
     markerWindow.open(map, marker);
 }
 
-// Toggle marker add mode on/off
+// Marker Add Mode Functions
 function toggleMarkerAddMode() {
     markerAddMode ? deactivateMarkerAddMode() : activateMarkerAddMode();
 }
 
-// Activate marker add mode
 function activateMarkerAddMode() {
-    const tempMarkerIcon = "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
     markerAddMode = true;
     setMarkerListener((event) => {
-        placeTemporaryMarker(event.latLng, tempMarkerIcon);
+        placeTemporaryMarker(event.latLng);
         updatePositionFields(event.latLng);
         dispatchMarkerEvent("markerAdded", event.latLng);
     });
 }
 
-// Deactivate marker add mode
 function deactivateMarkerAddMode() {
     markerAddMode = false;
     removeMarkerListener();
@@ -159,35 +211,14 @@ function deactivateMarkerAddMode() {
     updatePositionFields();
 }
 
-// Place a temporary marker on the map
-function placeTemporaryMarker(latLng, iconSrc) {
-    clearTemporaryMarker(); // Clear any existing temp marker
-    currentMarker = createMarker(latLng, "Temp Marker", iconSrc);
+// Marker Visibility Functions
+function toggleMarkers(shouldShow) {
+    markers.forEach(({ marker }) => {
+        marker.setMap(shouldShow ? map : null); // Show or hide each marker
+    });
 }
 
-// Clear the temporary marker
-function clearTemporaryMarker() {
-    if (currentMarker) {
-        currentMarker.setMap(null);
-        currentMarker = null;
-    }
-}
-
-// Set marker click listener
-function setMarkerListener(callback) {
-    removeMarkerListener();  // Remove any existing listener
-    markerListener = map.addListener("click", callback);
-}
-
-// Remove map click listener
-function removeMarkerListener() {
-    if (markerListener) {
-        google.maps.event.removeListener(markerListener);
-        markerListener = null;
-    }
-}
-
-// Update position fields in the form
+// Position Fields Functions
 function updatePositionFields(position = null) {
     const latField = document.getElementById("latitude");
     const lngField = document.getElementById("longitude");
@@ -200,73 +231,18 @@ function updatePositionFields(position = null) {
     }
 }
 
-// Dispatch custom marker events (add, update, delete)
-function dispatchMarkerEvent(eventType, position) {
-    const markerEvent = new CustomEvent(eventType, {
-        detail: { 
-            lat: position.lat, // Use the passed lat directly
-            lng: position.lng, // Use the passed lng directly
-            markerId: position.markerId // Include the markerId
-        },
-    });
-    document.dispatchEvent(markerEvent);
+// Marker Listener Functions
+function setMarkerListener(callback) {
+    removeMarkerListener();  // Remove any existing listener
+    markerListener = map.addListener("click", callback);
 }
 
-// Clear all existing markers from the map
-function clearMarkers() {
-    markers.forEach(({ marker }) => marker.setMap(null));  // Remove each marker from the map
-    markers = [];  // Clear the markers array
-}
-
-// Trigger custom events for updates and deletes
-function updateMarker(markerId, updatedData) {
-    dispatchMarkerEvent("markerUpdated", { markerId, updatedData });
-}
-
-function deleteMarker(markerId) {
-    const markerData = markers.find(m => m.id === Number(markerId));
-    if (markerData) {
-        const { lat, lng } = markerData.position; // Use saved position
-
-        // Remove marker from the map
-        markerData.marker.setMap(null);
-        markers = markers.filter(m => m.id !== markerId);
-        
-        // Trigger the API call to delete the store
-        fetch(`${BASE_URL}/api/store/${markerId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-        .then(response => response.json())  // Parse the JSON response
-        .then(data => {
-            if (data.status === 200) {
-                console.log(data.message); // 'Data deleted successfully'
-                alert(data.message); // Optionally show success message to the user
-                // Dispatch the event with lat, lng, and markerId
-                dispatchMarkerEvent("markerDeleted", { lat, lng, markerId });
-            } else {
-                console.error(`Failed to delete store with ID ${markerId}: ${data.message}`);
-                alert(`Failed to delete store: ${data.message}`);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error deleting store. Please try again.');
-        });
-        
-    } else {
-        console.error(`Marker with ID ${markerId} not found.`);
-        alert('Marker not found.');
+function removeMarkerListener() {
+    if (markerListener) {
+        google.maps.event.removeListener(markerListener);
+        markerListener = null;
     }
 }
 
-
-// Function to toggle markers visibility
-function toggleMarkers(shouldShow) {
-    markers.forEach(({ marker }) => {
-        marker.setMap(shouldShow ? map : null); // Show or hide each marker
-    });
-}
+// Initialize the map
 initMap();
