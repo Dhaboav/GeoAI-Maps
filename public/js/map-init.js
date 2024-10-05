@@ -70,8 +70,7 @@ async function fetchMarkers() {
 function addMarkerToMap(markerData) {
     const position = new google.maps.LatLng(markerData.latitude, markerData.longitude);
     const marker = createMarker(position, markerData.nama_toko, "https://maps.google.com/mapfiles/ms/icons/blue-dot.png");
-
-    markers.push({ id: markerData.id_toko, marker, position });
+    markers.push({ id: markerData.id_toko, name: markerData.nama_toko, marker, position });
     marker.addListener("click", () => openMarkerWindow(marker, markerData));
 }
 
@@ -164,6 +163,93 @@ function deleteMarker(markerId) {
     }
 }
 
+// Function to open the update form
+function openUpdateForm(markerId) {
+    const markerData = markers.find(m => m.id === Number(markerId));
+    if (markerData) {
+        document.getElementById("update-store-name").value = markerData.name;
+        document.getElementById("update-store-id").value = markerId; 
+        document.getElementById("update-latitude").value = markerData.position.lat(); 
+        document.getElementById("update-longitude").value = markerData.position.lng(); 
+    }
+    
+    const updateForm = document.getElementById("update-store-form");
+    updateForm.classList.remove("translate-y-full"); // Show the form
+}
+
+// Event listener for closing the update form
+document.getElementById("close-update-form").addEventListener("click", () => {
+    const updateForm = document.getElementById("update-store-form");
+    updateForm.classList.add("translate-y-full"); // Hide the form
+});
+
+// Event listener for the form submission
+document.getElementById("update-store-form-action").addEventListener("submit", (event) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    const confirmed = confirm("Are you sure you want to update this store?");
+    if (confirmed) {
+        // Get input values
+        const storeName = document.getElementById("update-store-name").value;
+        const latitude = parseFloat(document.getElementById("update-latitude").value);
+        const longitude = parseFloat(document.getElementById("update-longitude").value);
+
+        // Validate input values
+        if (!storeName || storeName.length > 30) {
+            alert("Store name is required and must be less than 30 characters.");
+            return;
+        }
+        if (isNaN(latitude) || latitude < -90 || latitude > 90) {
+            alert("Latitude must be a number between -90 and 90.");
+            return;
+        }
+        if (isNaN(longitude) || longitude < -180 || longitude > 180) {
+            alert("Longitude must be a number between -180 and 180.");
+            return;
+        }
+
+        // Construct the data object
+        const data = {
+            nama_toko: storeName,
+            latitude: latitude,
+            longitude: longitude
+        };
+
+        // Get the store ID from the hidden input
+        const storeId = document.getElementById("update-store-id").value;
+
+        // Send the data via Fetch API to the correct PUT endpoint
+        fetch(`${BASE_URL}/api/store/${storeId}`, {
+            method: 'PUT', // Use PUT for the update
+            headers: {
+                'Content-Type': 'application/json', // Set content type for JSON
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), // CSRF token
+            },
+            body: JSON.stringify(data), // Convert data object to JSON string
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(`Update failed: ${JSON.stringify(err)}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Update successful:", data);
+            // Reload markers after successful update
+            loadMarkers();  // Refresh the markers on the map
+
+            // Optionally hide the form
+            const updateForm = document.getElementById("update-store-form");
+            updateForm.classList.add("translate-y-full");
+        })
+        .catch(error => {
+            console.error("Error updating store:", error);
+        });
+    }
+});
+
 function dispatchMarkerEvent(eventType, position) {
     const markerEvent = new CustomEvent(eventType, {
         detail: { 
@@ -180,7 +266,7 @@ function generateMarkerContent(markerData) {
     return `
     <div class="marker-container">
         <h1 class="marker-title">${markerData.nama_toko}</h1>
-        <button class="button button-edit">Edit</button>
+        <button class="button button-edit" onclick="openUpdateForm('${markerData.id_toko}')">Edit</button>
         <button class="button button-delete" onclick="confirmDelete('${markerData.id_toko}')">Delete</button>
     </div>`;
 }
