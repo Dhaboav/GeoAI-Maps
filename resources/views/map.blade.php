@@ -7,6 +7,7 @@
    <meta name="csrf-token" content="{{ csrf_token() }}">
    @vite(['resources/css/app.css', 'resources/js/app.js'])
    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+   <link rel="stylesheet" type="text/css" href="{{ asset('css/style.css') }}"/>
 </head>
 
 <body class="flex flex-col min-h-screen">

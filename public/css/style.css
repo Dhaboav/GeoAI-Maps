@@ -1,0 +1,31 @@
+.marker-container {
+    padding: 1rem;
+}
+.marker-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+.button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 8px;
+}
+.button-edit {
+    background-color: #007bff;
+    color: white;
+}
+.button-edit:hover {
+    background-color: #0056b3;
+}
+.button-delete {
+    background-color: #dc3545;
+    color: white;
+}
+.button-delete:hover {
+    background-color: #c82333;
+}

@@ -43,13 +43,24 @@ function setUpEventListeners() {
     document.addEventListener("markerDeleted", handleMarkerEvent("markerDeleted"));
 }
 
-// Handle marker-related events (add, update, delete)
 function handleMarkerEvent(eventType) {
     return (event) => {
-        console.log(`${eventType}:`, event.detail);
-        loadMarkers(); // Reload markers after the respective event
+        if (eventType === "markerDeleted") {
+            const { markerId } = event.detail;
+            console.log(`Deleted marker ID: ${markerId}`);
+            
+            // Find the marker by ID and remove it from the map
+            const markerIndex = markers.findIndex(markerObj => markerObj.id === Number(markerId));
+            if (markerIndex !== -1) {
+                markers[markerIndex].marker.setMap(null); // Remove the marker from the map
+                markers.splice(markerIndex, 1); // Remove the marker from the array
+            }
+        } else {
+            loadMarkers(); // Reload markers after the respective event
+        }
     };
 }
+
 
 // Fetch markers from the API and update the map
 async function loadMarkers() {
@@ -66,7 +77,8 @@ async function fetchMarkers() {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
         const result = await response.json();
-        return result.data.map(({ nama_toko, latitude, longitude }) => ({
+        return result.data.map(({ id_toko, nama_toko, latitude, longitude }) => ({
+            id_toko,
             nama_toko,
             latitude,
             longitude,
@@ -83,7 +95,7 @@ function addMarkerToMap(markerData) {
     const blueDotIcon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
     const marker = createMarker(position, markerData.nama_toko, blueDotIcon);
 
-    markers.push({ marker, position });
+    markers.push({ id: markerData.id_toko, marker, position });
     marker.addListener("click", () => openMarkerWindow(marker, markerData));
 }
 
@@ -100,9 +112,21 @@ function createMarker(position, title, iconSrc) {
     });
 }
 
-// Generate content for the marker window
 function generateMarkerContent(markerData) {
-    return `<div><h1>${markerData.nama_toko}</h1></div>`;
+    return `
+    <div class="marker-container">
+        <h1 class="marker-title">${markerData.nama_toko}</h1>
+        <button class="button button-edit">Edit</button>
+        <button class="button button-delete" onclick="confirmDelete('${markerData.id_toko}')">Delete</button>
+    </div>`;
+}
+
+// Confirmation for deletion
+function confirmDelete(markerId) {
+    const confirmed = confirm("Are you sure you want to delete this marker?");
+    if (confirmed) {
+        deleteMarker(markerId);
+    }
 }
 
 // Open the marker window with given data
@@ -179,7 +203,11 @@ function updatePositionFields(position = null) {
 // Dispatch custom marker events (add, update, delete)
 function dispatchMarkerEvent(eventType, position) {
     const markerEvent = new CustomEvent(eventType, {
-        detail: { lat: position.lat(), lng: position.lng() },
+        detail: { 
+            lat: position.lat, // Use the passed lat directly
+            lng: position.lng, // Use the passed lng directly
+            markerId: position.markerId // Include the markerId
+        },
     });
     document.dispatchEvent(markerEvent);
 }
@@ -196,8 +224,44 @@ function updateMarker(markerId, updatedData) {
 }
 
 function deleteMarker(markerId) {
-    dispatchMarkerEvent("markerDeleted", { markerId });
+    const markerData = markers.find(m => m.id === Number(markerId));
+    if (markerData) {
+        const { lat, lng } = markerData.position; // Use saved position
+
+        // Remove marker from the map
+        markerData.marker.setMap(null);
+        markers = markers.filter(m => m.id !== markerId);
+        
+        // Trigger the API call to delete the store
+        fetch(`${BASE_URL}/api/store/${markerId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())  // Parse the JSON response
+        .then(data => {
+            if (data.status === 200) {
+                console.log(data.message); // 'Data deleted successfully'
+                alert(data.message); // Optionally show success message to the user
+                // Dispatch the event with lat, lng, and markerId
+                dispatchMarkerEvent("markerDeleted", { lat, lng, markerId });
+            } else {
+                console.error(`Failed to delete store with ID ${markerId}: ${data.message}`);
+                alert(`Failed to delete store: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting store. Please try again.');
+        });
+        
+    } else {
+        console.error(`Marker with ID ${markerId} not found.`);
+        alert('Marker not found.');
+    }
 }
+
 
 // Function to toggle markers visibility
 function toggleMarkers(shouldShow) {
