@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->bigInteger('barcode_id')->unique();
+            $table->bigInteger('barcode_id')->unsigned()->primary();
             $table->string('nama_produk', 30);
             $table->string('kategori', 30);
         });

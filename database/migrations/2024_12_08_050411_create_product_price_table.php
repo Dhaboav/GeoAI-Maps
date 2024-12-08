@@ -12,11 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_price', function (Blueprint $table) {
-            $table->id(); 
+            $table->id();
             $table->foreignId('id_toko')->constrained('stores', 'id_toko')->onDelete('cascade');
-            $table->bigInteger('barcode_id')->constrained('products', 'barcode_id')->onDelete('cascade');
+
+            // Ensure barcode_id is unsigned bigInteger
+            $table->bigInteger('barcode_id')->unsigned();
+
             $table->decimal('price', 10, 2);
             $table->timestamps();
+
+            // Add foreign key constraint after defining the column
+            $table->foreign('barcode_id')->references('barcode_id')->on('products')->onDelete('cascade');
         });
     }
 
