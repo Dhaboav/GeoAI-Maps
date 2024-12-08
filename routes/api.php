@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +29,5 @@ Route::put('store/{store}', [StoreController::class, 'updateStore']);
 Route::delete('store/{store}', [StoreController::class, 'deleteStore']);
 
 // Produk
+Route::get('products', [ProductController::class, 'getProduct']);
+Route::post('products', [ProductController::class, 'addProduct']);

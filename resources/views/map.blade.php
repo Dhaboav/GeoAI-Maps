@@ -222,7 +222,7 @@
          </svg>
          <span class="sr-only">Close menu</span>
       </button>
-      <form id="product-form" method="POST" class="mb-6">
+      <form id="product-form" action="{{ url('api/products') }}" method="POST" class="mb-6">
          @csrf
          <input type="hidden" id="add-product-id" name="product-id" />
          <div class="grid gap-4 mb-4 grid-cols-2">
@@ -315,6 +315,7 @@
    <script src="{{ asset('js/theme-toggle.js') }}"></script>
    <script src="{{ asset('js/map-init.js') }}"></script>
    <script src="{{ asset('js/store-form.js') }}"></script>
+   <script src="{{ asset('js/product-form.js') }}"></script>
    <!-- Javascript end -->
    
 </body>
