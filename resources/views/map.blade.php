@@ -71,6 +71,18 @@
                </button>
             </li>
             <li>
+               <button id="add-product" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full" data-drawer-hide="drawer-navigation" data-drawer-backdrop="false" data-drawer-target="add-product-form" data-drawer-show="add-product-form" data-drawer-placement="bottom" aria-controls="add-product-form">
+                  <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                     <g id="SVGRepo_iconCarrier">
+                        <path d="M11.707 2.293A.996.996 0 0 0 11 2H6a.996.996 0 0 0-.707.293l-3 3A.996.996 0 0 0 2 6v5c0 .266.105.52.293.707l10 10a.997.997 0 0 0 1.414 0l8-8a.999.999 0 0 0 0-1.414l-10-10zM8.353 10a1.647 1.647 0 1 1-.001-3.293A1.647 1.647 0 0 1 8.353 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                     </g>
+                  </svg>
+                  <span class="ms-3">Add Product</span>
+               </button>
+            </li>
+            <li>
                <button id="show-all" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full">
                <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -129,6 +141,7 @@
             </div>
             <!-- Modal footer -->
             <form class="p-4 md:p-5">
+               @csrf
                <div class="grid gap-4 mb-4 grid-cols-2">
                   <div class="col-span-2">
                      <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
@@ -142,14 +155,6 @@
                      <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
                      <input type="number" name="price" id="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Rp.2999" required="">
                   </div>
-                  <div class="col-span-2 sm:col-span-1">
-                     <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
-                     <select id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                           <option selected="">Select category</option>
-                           <option value="minuman">Food</option>
-                           <option value="makanan">Drink</option>
-                     </select>
-                  </div>    
                   <div class="col-span-2">
                      <label for="store" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Store</label>
                      <select id="store" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
@@ -203,6 +208,42 @@
    </div>
    <!-- Add palace form end -->
 
+   <!-- Add product form begin -->
+   <div id="add-product-form" class="fixed bottom-0 left-0 z-40 md:max-w-80 p-4 overflow-y-auto  bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="add-product-label">
+      <h5 id="add-product-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+         <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+         </svg>
+         Add Product
+      </h5>
+      <button id="close-store-form" type="button" data-drawer-hide="add-product-form" aria-controls="add-product-form" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
+         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+         </svg>
+         <span class="sr-only">Close menu</span>
+      </button>
+      <form id="product-form" method="POST" class="mb-6">
+         @csrf
+         <input type="hidden" id="add-product-id" name="product-id" />
+         <div class="grid gap-4 mb-4 grid-cols-2">
+            <div class="col-span-2">
+               <label for="product-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product name</label>
+               <input type="text" id="product-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type product name" required />
+            </div>
+            <div class="col-span-1">
+               <label for="product-barcode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Barcode</label>
+               <input type="number" id="product-barcode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Barcode" required />
+            </div>
+            <div class="col-span-1">
+               <label for="product-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
+               <input type="text" id="product-category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Category" required />
+            </div>
+         </div>
+         <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 w-full focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 block">Add Product</button>
+      </form>
+   </div>
+   <!-- Add product form end -->
+
    <!-- Update store form begin -->
    <div id="update-store-form" class="fixed bottom-0 w-full left-0 z-40 md:max-w-80 p-4 overflow-y-auto bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="update-store-label">
       <h5 id="update-store-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
@@ -238,7 +279,6 @@
       </form>
    </div>
    <!-- Update store form end -->
-
 
    <!-- Map Container begin -->
    <div id="map" class="flex-grow w-screen"></div>

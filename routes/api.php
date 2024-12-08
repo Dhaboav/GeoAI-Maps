@@ -26,3 +26,5 @@ Route::get('store', [StoreController::class, 'getStore']);
 Route::post('store', [StoreController::class, 'addStore']);
 Route::put('store/{store}', [StoreController::class, 'updateStore']);
 Route::delete('store/{store}', [StoreController::class, 'deleteStore']);
+
+// Produk
