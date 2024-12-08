@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Models\Store;
+use App\Models\Product;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +18,7 @@ use App\Models\Store;
 
 Route::get('/', function () {
     return view('map', [
-        "stores"=>Store::all()
+        'stores'=>Store::all(),
+        'products'=>Product::all()
     ]);
 });

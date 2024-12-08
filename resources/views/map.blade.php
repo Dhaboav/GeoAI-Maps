@@ -123,7 +123,7 @@
             <!-- Modal header -->
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                <h3 class="text-xl font-medium text-gray-900 dark:text-white">
-                  Barcode scanner
+                  List Harga Toko
                </h3>
                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="small-modal">
                   <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -132,26 +132,23 @@
                   <span class="sr-only">Close modal</span>
                </button>
             </div>
-            <!-- Modal body -->
-            <div class="p-4 md:p-5 space-y-4">
-               <div id="reader"></div>
-                  <button id="startButton" class="w-full bg-blue-700 text-white rounded-lg py-2 mt-4">Start Scanning</button>
-                  <input type="file" id="imageInput" accept="image/*" class="hidden">
-                  <button id="imageButton" class="w-full bg-blue-700 text-white rounded-lg py-2 mt-4">Select Image</button>     
-            </div>
             <!-- Modal footer -->
             <form class="p-4 md:p-5">
                @csrf
                <div class="grid gap-4 mb-4 grid-cols-2">
                   <div class="col-span-2">
-                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-                     <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type product name" required="">
-                  </div>
+                     <label for="produk" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Produk</label>
+                     <select id="produk" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                           @foreach($products as $product)
+                           <option selected="" value="{{$product->barcode_id}}">{{$product->nama_produk}}</option>
+                           @endforeach
+                     </select>
+                  </div>    
                   <div class="col-span-2">
                      <label for="barcode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Barcode ID</label>
                      <input type="text" name="barcode" id="barcode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type barcode id" required="">
                   </div>
-                  <div class="col-span-2 sm:col-span-1">
+                  <div class="col-span-2">
                      <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
                      <input type="number" name="price" id="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Rp.2999" required="">
                   </div>
@@ -316,6 +313,16 @@
    <script src="{{ asset('js/map-init.js') }}"></script>
    <script src="{{ asset('js/store-form.js') }}"></script>
    <script src="{{ asset('js/product-form.js') }}"></script>
+
+   <script>
+      document.getElementById('produk').addEventListener('change', function() {
+         // Get the selected barcode ID
+         const barcodeId = this.value;
+
+         // Set the barcode input's value
+         document.getElementById('barcode').value = barcodeId;
+      });
+   </script>
    <!-- Javascript end -->
    
 </body>
