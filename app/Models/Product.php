@@ -15,4 +15,9 @@ class Product extends Model
         'nama_produk',
         'kategori'
     ];
+
+    public function productPrices()
+    {
+        return $this->hasMany(ProductPrice::class, 'barcode_id', 'barcode_id');
+    }
 }

@@ -16,4 +16,9 @@ class Store extends Model
         'latitude',
         'longitude',
     ];
+    
+    public function productPrices()
+    {
+        return $this->hasMany(ProductPrice::class, 'id_toko', 'id_toko');
+    }
 }

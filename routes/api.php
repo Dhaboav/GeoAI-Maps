@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductPriceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,3 +32,7 @@ Route::delete('store/{store}', [StoreController::class, 'deleteStore']);
 // Produk
 Route::get('products', [ProductController::class, 'getProduct']);
 Route::post('products', [ProductController::class, 'addProduct']);
+
+// Harga Produk
+Route::get('price', [ProductPriceController::class, 'getPrice']);
+Route::post('price', [ProductPriceController::class, 'addPrice']);

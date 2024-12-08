@@ -47,15 +47,14 @@
          <ul class="space-y-2 font-medium">
             <li>
                <button data-modal-target="small-modal" data-drawer-hide="drawer-bottom-example" data-modal-toggle="small-modal" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full">
-                  <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                  <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                      <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                      <g id="SVGRepo_iconCarrier">
-                        <path d="M23 4.5V8h-1V4.5A1.502 1.502 0 0 0 20.5 3H17V2h3.5A2.503 2.503 0 0 1 23 4.5zM4.5 22A1.502 1.502 0 0 1 3 20.5V17H2v3.5A2.503 2.503 0 0 0 4.5 23H8v-1zM22 20.5a1.502 1.502 0 0 1-1.5 1.5H17v1h3.5a2.503 2.503 0 0 0 2.5-2.5V17h-1zM3 4.5A1.502 1.502 0 0 1 4.5 3H8V2H4.5A2.503 2.503 0 0 0 2 4.5V8h1zM10 19V6H9v13zM6 6v13h2V6zm8 13V6h-2v13zm3-13v13h2V6zm-2 0v13h1V6z"></path>
-                        <path fill="none" d="M0 0h24v24H0z"></path>
+                        <path d="M11.707 2.293A.996.996 0 0 0 11 2H6a.996.996 0 0 0-.707.293l-3 3A.996.996 0 0 0 2 6v5c0 .266.105.52.293.707l10 10a.997.997 0 0 0 1.414 0l8-8a.999.999 0 0 0 0-1.414l-10-10zM8.353 10a1.647 1.647 0 1 1-.001-3.293A1.647 1.647 0 0 1 8.353 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                      </g>
                   </svg>
-                  <span class="ms-3">Scan Barcode</span>
+                  <span class="ms-3">Add product</span>
                </button>
             </li>
             <li>
@@ -72,14 +71,15 @@
             </li>
             <li>
                <button id="add-product" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group w-full" data-drawer-hide="drawer-navigation" data-drawer-backdrop="false" data-drawer-target="add-product-form" data-drawer-show="add-product-form" data-drawer-placement="bottom" aria-controls="add-product-form">
-                  <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <svg class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                      <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                      <g id="SVGRepo_iconCarrier">
-                        <path d="M11.707 2.293A.996.996 0 0 0 11 2H6a.996.996 0 0 0-.707.293l-3 3A.996.996 0 0 0 2 6v5c0 .266.105.52.293.707l10 10a.997.997 0 0 0 1.414 0l8-8a.999.999 0 0 0 0-1.414l-10-10zM8.353 10a1.647 1.647 0 1 1-.001-3.293A1.647 1.647 0 0 1 8.353 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M23 4.5V8h-1V4.5A1.502 1.502 0 0 0 20.5 3H17V2h3.5A2.503 2.503 0 0 1 23 4.5zM4.5 22A1.502 1.502 0 0 1 3 20.5V17H2v3.5A2.503 2.503 0 0 0 4.5 23H8v-1zM22 20.5a1.502 1.502 0 0 1-1.5 1.5H17v1h3.5a2.503 2.503 0 0 0 2.5-2.5V17h-1zM3 4.5A1.502 1.502 0 0 1 4.5 3H8V2H4.5A2.503 2.503 0 0 0 2 4.5V8h1zM10 19V6H9v13zM6 6v13h2V6zm8 13V6h-2v13zm3-13v13h2V6zm-2 0v13h1V6z"></path>
+                        <path fill="none" d="M0 0h24v24H0z"></path>
                      </g>
                   </svg>
-                  <span class="ms-3">Add Product</span>
+                  <span class="ms-3">Scan Product</span>
                </button>
             </li>
             <li>
@@ -115,7 +115,7 @@
    </div>
    <!-- Menu component end -->
 
-   <!-- Scanner begin-->
+   <!-- Add product begin-->
    <div id="small-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
       <div class="relative w-full max-w-md max-h-full">
          <!-- Modal content -->
@@ -133,13 +133,13 @@
                </button>
             </div>
             <!-- Modal footer -->
-            <form class="p-4 md:p-5">
+            <form id="add-product-price-form" action="{{ url('api/price') }}" method="POST" class="p-4 md:p-5">
                @csrf
                <div class="grid gap-4 mb-4 grid-cols-2">
                   <div class="col-span-2">
                      <label for="produk" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Produk</label>
                      <select id="produk" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                        <option value="" selected disabled>Select a product</option>
+                        <option>Select a product</option>
                            @foreach($products as $product)
                            <option selected="" value="{{$product->barcode_id}}">{{$product->nama_produk}}</option>
                            @endforeach
@@ -171,7 +171,7 @@
          </div>
       </div>
    </div> 
-   <!-- Scanner end -->
+   <!-- Add product end -->
 
    <!-- Add palace form begin -->
    <div id="drawer-bottom-example" class="fixed bottom-0 left-0 z-40 md:max-w-80 p-4 overflow-y-auto  bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="drawer-bottom-label">
@@ -206,7 +206,7 @@
    </div>
    <!-- Add palace form end -->
 
-   <!-- Add product form begin -->
+   <!-- scan product form begin -->
    <div id="add-product-form" class="fixed bottom-0 left-0 z-40 md:max-w-80 p-4 overflow-y-auto bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="add-product-label">
       <h5 id="add-product-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
          <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -250,7 +250,7 @@
          <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 w-full focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 block">Add Product</button>
       </form>
    </div>
-   <!-- Add product form end -->
+   <!-- scan product form end -->
 
    <!-- Update store form begin -->
    <div id="update-store-form" class="fixed bottom-0 w-full left-0 z-40 md:max-w-80 p-4 overflow-y-auto bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="update-store-label">
@@ -324,6 +324,7 @@
    <script src="{{ asset('js/map-init.js') }}"></script>
    <script src="{{ asset('js/store-form.js') }}"></script>
    <script src="{{ asset('js/product-form.js') }}"></script>
+   <script src="{{ asset('js/product-price-form.js') }}"></script>
 
    <script>
       // JavaScript to handle product selection and barcode autofill
