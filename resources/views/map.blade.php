@@ -154,6 +154,9 @@
                      <label for="store" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Store</label>
                      <select id="store" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                            <option selected="">Select store</option>
+                           @foreach($stores as $store)
+                           <option selected="" value="{{$store->id_toko}}">{{$store->nama_toko}}</option>
+                           @endforeach
                      </select>
                   </div>    
                </div>
@@ -266,7 +269,7 @@
    <!-- Javascript begin -->
    <script src="{{ asset('js/api-key.js') }}"></script>
    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-      ({key: API_KEY, v: "weekly"});</script>
+      ({key: "{{ env('GOOGLE_MAPS_API_KEY') }}", v: "weekly"});</script>
 
    <script src="{{ asset('js/barcode-scanner.js') }}"></script>
    <script src="{{ asset('js/theme-toggle.js') }}"></script>
