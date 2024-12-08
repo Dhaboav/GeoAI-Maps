@@ -139,6 +139,7 @@
                   <div class="col-span-2">
                      <label for="produk" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Produk</label>
                      <select id="produk" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                        <option value="" selected disabled>Select a product</option>
                            @foreach($products as $product)
                            <option selected="" value="{{$product->barcode_id}}">{{$product->nama_produk}}</option>
                            @endforeach
@@ -206,34 +207,44 @@
    <!-- Add palace form end -->
 
    <!-- Add product form begin -->
-   <div id="add-product-form" class="fixed bottom-0 left-0 z-40 md:max-w-80 p-4 overflow-y-auto  bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="add-product-label">
+   <div id="add-product-form" class="fixed bottom-0 left-0 z-40 md:max-w-80 p-4 overflow-y-auto bg-white dark:bg-gray-800 translate-y-full" tabindex="-1" aria-labelledby="add-product-label">
       <h5 id="add-product-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
          <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
          </svg>
          Add Product
       </h5>
-      <button id="close-store-form" type="button" data-drawer-hide="add-product-form" aria-controls="add-product-form" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
+      <button id="close-store-form" type="button" data-drawer-hide="add-product-form" aria-controls="add-product-form" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white">
          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
          </svg>
          <span class="sr-only">Close menu</span>
       </button>
-      <form id="product-form" action="{{ url('api/products') }}" method="POST" class="mb-6">
+
+      <!-- Scanner Section -->
+      <div class="mb-6">
+         <div id="reader" class="mb-4"></div>
+         <button id="startButton" class="w-full bg-blue-700 text-white rounded-lg py-2">Start Scanning</button>
+         <input type="file" id="imageInput" accept="image/*" class="hidden">
+         <button id="imageButton" class="w-full bg-blue-700 text-white rounded-lg py-2 mt-4">Select Image</button>
+      </div>
+
+      <!-- Product Form -->
+      <form id="product-form" action="{{ url('api/products') }}" method="POST">
          @csrf
          <input type="hidden" id="add-product-id" name="product-id" />
          <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
                <label for="product-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product name</label>
-               <input type="text" id="product-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type product name" required />
+               <input type="text" id="product-name" name="product-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Type product name" required />
             </div>
             <div class="col-span-1">
                <label for="product-barcode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Barcode</label>
-               <input type="number" id="product-barcode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Barcode" required />
+               <input type="number" id="product-barcode" name="barcode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Barcode" required />
             </div>
             <div class="col-span-1">
                <label for="product-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
-               <input type="text" id="product-category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Category" required />
+               <input type="text" id="product-category" name="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Category" required />
             </div>
          </div>
          <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 w-full focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 block">Add Product</button>
@@ -315,12 +326,13 @@
    <script src="{{ asset('js/product-form.js') }}"></script>
 
    <script>
-      document.getElementById('produk').addEventListener('change', function() {
-         // Get the selected barcode ID
-         const barcodeId = this.value;
+      // JavaScript to handle product selection and barcode autofill
+      document.getElementById("produk").addEventListener("change", function () {
+         // Get the selected value (barcode_id) from the dropdown
+         const selectedBarcode = this.value;
 
-         // Set the barcode input's value
-         document.getElementById('barcode').value = barcodeId;
+         // Set the value of the barcode input field
+         document.getElementById("barcode").value = selectedBarcode;
       });
    </script>
    <!-- Javascript end -->

@@ -17,9 +17,9 @@ function startScanning() {
                         (decodedText, decodedResult) => {
                             if (!isBarcodeDetected) {
                                 // Display scanned result without any prefix
-                                document.getElementById("barcode").value = decodedText; // Set the input value
+                                document.getElementById("product-barcode").value = decodedText; // Set the input value
                                 isBarcodeDetected = true; // Set flag to indicate barcode has been detected
-                                stopScanning();
+                                stopScanning(); // Stop scanning after detecting barcode
                             }
                         },
                         (errorMessage) => {
@@ -28,6 +28,7 @@ function startScanning() {
                     )
                     .then(() => {
                         isScanning = true; // Set scanning to true
+                        document.getElementById("startButton").innerText = "Stop Scanning"; // Update button text
                         document.getElementById("imageButton").style.display = "none"; // Hide upload button
                     })
                     .catch((err) => {
@@ -50,6 +51,7 @@ function stopScanning() {
                 console.log("QR Code scanning is stopped.");
                 isScanning = false; // Reset scanning state
                 isBarcodeDetected = false; // Reset barcode detected state
+                document.getElementById("startButton").innerText = "Start Scanning"; // Update button text
                 document.getElementById("imageButton").style.display = "block"; // Show upload button
             })
             .catch((err) => {
@@ -59,10 +61,10 @@ function stopScanning() {
 }
 
 document.getElementById("startButton").onclick = function () {
-    resetState(); // Reset state first
     if (isScanning) {
         stopScanning();
     } else {
+        resetState(); // Reset state before starting
         startScanning();
     }
 };
@@ -88,7 +90,7 @@ document.getElementById("imageInput").addEventListener("change", function () {
             .scanFile(imageFile, false) // Pass the image file directly
             .then((decodedText) => {
                 // Set the input value with the scanned text
-                document.getElementById("barcode").value = decodedText; 
+                document.getElementById("product-barcode").value = decodedText; 
                 isBarcodeDetected = true; // Set flag for barcode detection
 
                 // Send the scanned text to the server
@@ -97,7 +99,7 @@ document.getElementById("imageInput").addEventListener("change", function () {
             .catch((err) => {
                 console.error("Error scanning image: ", err);
                 // Set the input value to "Invalid barcode"
-                document.getElementById("barcode").value = "Invalid barcode.";
+                document.getElementById("product-barcode").value = "Invalid barcode.";
             });
     } else {
         alert("Please select an image file.");
@@ -109,7 +111,7 @@ function resetState() {
     isScanning = false;
     isBarcodeDetected = false;
     document.getElementById("startButton").innerText = "Start Scanning";
-    document.getElementById("barcode").value = ""; // Clear previous results
+    document.getElementById("product-barcode").value = ""; // Clear previous results
 }
 
 // Example function to send the result to the server
