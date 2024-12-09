@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Store;
 use App\Models\Product;
 
+use App\Http\Controllers\SearchController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,3 +23,5 @@ Route::get('/', function () {
         'products'=>Product::all()
     ]);
 });
+
+Route::post('/process-input', [SearchController::class, 'processInput'])->name('processInput');
