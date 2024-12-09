@@ -6,23 +6,64 @@ let markerListener = null;
 let markerAddMode = false;
 const BASE_URL = `${window.location.origin}`;
 
+
+// Load Google Maps libraries
+async function loadGoogleMaps() {
+	const { Map, Circle, LatLng } = await google.maps.importLibrary("maps");
+	const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+	const { spherical } = await google.maps.importLibrary("geometry");
+	return { Map, Circle, LatLng, AdvancedMarkerElement, spherical };
+}
+
+// Get user location
+function getUserLocation() {
+    return new Promise((resolve) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const location = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+                    console.log("User location:", location);
+                    resolve(location);
+                },
+                (error) => {
+                    console.error("Error fetching GPS location:", error);
+
+                    // Default location fallback
+                    const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Example: San Francisco
+                    console.log("Using default location:", defaultLocation);
+                    resolve(defaultLocation);
+                }
+            );
+        } else {
+            console.log("Geolocation not supported. Using default location.");
+            
+            // Default location fallback
+            const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Example: San Francisco
+            resolve(defaultLocation);
+        }
+    });
+}
+
 // Initialization Functions
 async function initMap() {
-    const position = { lat: -0.05572, lng: 109.3485 };
+    const userLocation = await getUserLocation(); // Wait for user location
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
     map = new Map(document.getElementById("map"), {
-        zoom: 12,
-        center: position,
+        zoom: 16,
+        center: userLocation,
         mapId: "DEMO_MAP_ID",
         disableDefaultUI: true,
     });
 
     new AdvancedMarkerElement({
         map: map,
-        position: position,
-        title: "Pontianak",
+        position: userLocation,
+        title: "User",
     });
 
     markerWindow = new google.maps.InfoWindow();
@@ -330,5 +371,5 @@ function removeMarkerListener() {
     }
 }
 
-// Initialize the map
+// Call the initMap function to set up the map
 initMap();
