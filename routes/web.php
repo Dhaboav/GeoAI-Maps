@@ -24,4 +24,4 @@ Route::get('/', function () {
     ]);
 });
 
-Route::post('/process-input', [SearchController::class, 'processInput'])->name('processInput');
+Route::post('/processInput', [SearchController::class, 'processInput'])->name('processInput');

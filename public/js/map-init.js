@@ -4,6 +4,8 @@ let markerWindow;
 let currentMarker = null;
 let markerListener = null;
 let markerAddMode = false;
+let userLocation;
+let circle = null;
 const BASE_URL = `${window.location.origin}`;
 
 
@@ -49,7 +51,8 @@ function getUserLocation() {
 
 // Initialization Functions
 async function initMap() {
-    const userLocation = await getUserLocation(); // Wait for user location
+    // Wait for user location
+    userLocation = await getUserLocation()
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
@@ -81,6 +84,17 @@ function setUpEventListeners() {
     ["markerAdded", "markerUpdated", "markerDeleted"].forEach(eventType => {
         document.addEventListener(eventType, handleMarkerEvent(eventType));
     });
+
+    // New event listener for the search button
+    document.getElementById("search-button").addEventListener("click", (event) => {
+        event.preventDefault();  // Prevent form submission
+        const query = document.getElementById("default-search").value;
+        if (query) {
+            handleSearch(query); // Call handleSearch with the user's input
+        } else {
+            alert("Please enter a search term.");
+        }
+    });
 }
 
 // Marker Management Functions
@@ -111,6 +125,8 @@ async function fetchMarkers() {
 function addMarkerToMap(markerData) {
     const position = new google.maps.LatLng(markerData.latitude, markerData.longitude);
     const marker = createMarker(position, markerData.nama_toko, "https://maps.google.com/mapfiles/ms/icons/blue-dot.png");
+
+    marker.setMap(null); 
     markers.push({ id: markerData.id_toko, name: markerData.nama_toko, marker, position });
     marker.addListener("click", () => openMarkerWindow(marker, markerData));
 }
@@ -368,6 +384,96 @@ function removeMarkerListener() {
     if (markerListener) {
         google.maps.event.removeListener(markerListener);
         markerListener = null;
+    }
+}
+
+// Search function to handle the search action and update the map
+async function handleSearch(query) {
+    try {
+        // Trigger the API to process the input (using POST request with the input data)
+        const response = await fetch(`${BASE_URL}/processInput`, {  // Use the full URL
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),  // For CSRF protection
+            },
+            body: JSON.stringify({ input: query })  // Send query data as JSON
+        });
+
+        // Wait for JSON response
+        const data = await response.json();
+
+        if (response.ok) {
+            // Process the barcode_id and jarak from the response
+            const barcodeId = data.barcode_id;
+            const jarak = data.jarak;
+
+            // Log the barcode_id and jarak for debugging
+            console.log("Barcode ID:", barcodeId);
+            console.log("Jarak:", jarak);
+
+            // If jarak exists, update the map with the new radius
+            if (jarak) {
+                const numericJarak = parseFloat(jarak);  // Convert jarak from string to numeric value
+                if (!isNaN(numericJarak)) {
+                    setRadiusFromJarak(numericJarak);  // Update the map's circle radius based on the numeric value of jarak
+                } else {
+                    console.error('Invalid radius (jarak) value:', jarak);  // Handle invalid numeric value
+                }
+            }
+
+            // You may want to center the map or add a marker depending on the response
+            // Example: centerMap(barcodeId);
+        } else {
+            // Handle errors (e.g., invalid input)
+            console.error('Error:', data.error);
+            alert(data.error || 'Something went wrong!');  // Show error to the user
+        }
+    } catch (error) {
+        console.error('Error during search fetch:', error);
+        alert('An error occurred during the search. Please try again later.');
+    }
+}
+
+async function setRadiusFromJarak(radius) {
+    const { spherical } = await loadGoogleMaps();
+
+    if (circle) circle.setMap(null); // Clear existing circle
+
+    // Create a new circle with the provided center and radius
+    circle = new google.maps.Circle({
+        strokeColor: "#008000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#008000",
+        fillOpacity: 0.25,
+        map: map, // Make sure the circle is added to the map
+        center: userLocation,
+        radius: radius,
+    });
+
+    // Update markers visibility right after the circle is created
+    updateMarkersVisibility();
+}
+
+async function updateMarkersVisibility() {
+    const { spherical } = await loadGoogleMaps();
+
+    if (circle) {
+        const center = circle.getCenter();
+        const radius = circle.getRadius();
+
+        markers.forEach((markerObj) => {
+            const marker = markerObj.marker;
+            const position = markerObj.position;
+
+            const distance = spherical.computeDistanceBetween(position, center);
+            marker.setMap(distance <= radius ? map : null);  // Show or hide marker based on distance
+        });
+    } else {
+        markers.forEach((markerObj) =>
+            markerObj.marker.setMap(markersMapStatus ? map : null)
+        );
     }
 }
 
