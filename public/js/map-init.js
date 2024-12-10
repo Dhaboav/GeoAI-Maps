@@ -34,7 +34,7 @@ function getUserLocation() {
                     console.error("Error fetching GPS location:", error);
 
                     // Default location fallback
-                    const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Example: San Francisco
+                    const defaultLocation = { lat: 1.171851 , lng: 108.979383 }; 
                     console.log("Using default location:", defaultLocation);
                     resolve(defaultLocation);
                 }
@@ -43,7 +43,7 @@ function getUserLocation() {
             console.log("Geolocation not supported. Using default location.");
             
             // Default location fallback
-            const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Example: San Francisco
+            const defaultLocation = { lat: 1.171851 , lng: 108.979383 }; 
             resolve(defaultLocation);
         }
     });
@@ -387,47 +387,34 @@ function removeMarkerListener() {
     }
 }
 
-// Search function to handle the search action and update the map
+// Search bar and circle to show
 async function handleSearch(query) {
     try {
-        // Trigger the API to process the input (using POST request with the input data)
-        const response = await fetch(`${BASE_URL}/processInput`, {  // Use the full URL
+        const response = await fetch(`${BASE_URL}/processInput`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),  // For CSRF protection
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             },
-            body: JSON.stringify({ input: query })  // Send query data as JSON
+            body: JSON.stringify({ input: query }),
         });
 
-        // Wait for JSON response
         const data = await response.json();
 
         if (response.ok) {
-            // Process the barcode_id and jarak from the response
-            const barcodeId = data.barcode_id;
-            const jarak = data.jarak;
+            const { id_tokos, jarak } = data;
 
-            // Log the barcode_id and jarak for debugging
-            console.log("Barcode ID:", barcodeId);
-            console.log("Jarak:", jarak);
+            // console.log("ID Tokos from query:", id_tokos);  // Debugging: check what ID's we got
+            // console.log("Jarak:", jarak);
 
-            // If jarak exists, update the map with the new radius
-            if (jarak) {
-                const numericJarak = parseFloat(jarak);  // Convert jarak from string to numeric value
-                if (!isNaN(numericJarak)) {
-                    setRadiusFromJarak(numericJarak);  // Update the map's circle radius based on the numeric value of jarak
-                } else {
-                    console.error('Invalid radius (jarak) value:', jarak);  // Handle invalid numeric value
-                }
-            }
+            // Apply the circle radius and show the circle on the map
+            await setRadiusFromJarak(parseFloat(jarak), id_tokos);
 
-            // You may want to center the map or add a marker depending on the response
-            // Example: centerMap(barcodeId);
+            // Filter markers based on id_toko and distance
+            filterMarkersByIdAndDistance(id_tokos, parseFloat(jarak));
         } else {
-            // Handle errors (e.g., invalid input)
             console.error('Error:', data.error);
-            alert(data.error || 'Something went wrong!');  // Show error to the user
+            alert(data.error || 'Something went wrong!');
         }
     } catch (error) {
         console.error('Error during search fetch:', error);
@@ -435,47 +422,58 @@ async function handleSearch(query) {
     }
 }
 
-async function setRadiusFromJarak(radius) {
+async function setRadiusFromJarak(radius, id_tokos) {
     const { spherical } = await loadGoogleMaps();
 
-    if (circle) circle.setMap(null); // Clear existing circle
-
-    // Create a new circle with the provided center and radius
+    if (circle) circle.setMap(null); 
     circle = new google.maps.Circle({
         strokeColor: "#008000",
         strokeOpacity: 0.8,
         strokeWeight: 2,
         fillColor: "#008000",
         fillOpacity: 0.25,
-        map: map, // Make sure the circle is added to the map
-        center: userLocation,
+        map: map, 
+        center: userLocation, 
         radius: radius,
     });
-
-    // Update markers visibility right after the circle is created
-    updateMarkersVisibility();
+    filterMarkersByIdAndDistance(id_tokos, radius);
 }
 
-async function updateMarkersVisibility() {
-    const { spherical } = await loadGoogleMaps();
+function filterMarkersByIdAndDistance(idTokos, jarak) {
+    // console.log("Filtering markers with ID's:", idTokos);  // Debugging: check idTokos
 
     if (circle) {
         const center = circle.getCenter();
-        const radius = circle.getRadius();
+        const radius = jarak;
 
-        markers.forEach((markerObj) => {
-            const marker = markerObj.marker;
-            const position = markerObj.position;
+        markers.forEach(markerObj => {
+            const { id, position, marker } = markerObj;
 
-            const distance = spherical.computeDistanceBetween(position, center);
-            marker.setMap(distance <= radius ? map : null);  // Show or hide marker based on distance
+            // // Debugging: Check marker's id_toko and see if it's in the idTokos array
+            // console.log(`Marker ID: ${id} (should match one of: ${idTokos})`);
+
+            // 1. Check if marker's id_toko is in the list of id_tokos from the query
+            const isValidId = idTokos.includes(id);
+
+            // 2. Calculate the distance from the circle center
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(position, center);
+
+            // // Debugging: Show distance check
+            // console.log(`Distance from center: ${distance} (Radius: ${radius})`);
+
+            // 3. Apply filtering: Show only markers that match id_toko and are within the distance
+            if (isValidId && distance <= radius) {
+                // console.log(`Showing marker ${id}`);
+                marker.setMap(map); // Show marker if within radius and has valid id_toko
+            } else {
+                // console.log(`Hiding marker ${id}`);
+                marker.setMap(null); // Hide marker if outside radius or invalid id_toko
+            }
         });
     } else {
-        markers.forEach((markerObj) =>
-            markerObj.marker.setMap(markersMapStatus ? map : null)
-        );
+        // Ensure all markers are hidden if the circle is not available
+        markers.forEach((markerObj) => markerObj.marker.setMap(null));
     }
 }
 
-// Call the initMap function to set up the map
 initMap();

@@ -4,41 +4,45 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\DB;
+
 class SearchController extends Controller
 {
     public function processInput(Request $request) {
-        // Validate input
         $request->validate([
             'input' => 'nullable|string',
         ]);
-    
-        // Get input
+
         $input = $request->input('input');
-    
-        // Check if the input is empty
+
         if (empty($input)) {
-            return response()->json([
-                'error' => 'Input cannot be empty.',
-            ], 400);
+            return response()->json(['error' => 'Input cannot be empty.'], 400);
         }
-    
+
         // Split input into parts
         $parts = explode(' ', $input);
-    
-        // Assign parts to variables
         $barcode_id = $parts[0] ?? null;
         $jarak = $parts[1] ?? null;
-    
-        // Validate jarak if it exists
-        if ($jarak !== null && !is_numeric($jarak)) {
-            return response()->json([
-                'error' => 'Jarak must be a valid number.',
-            ], 400);
+
+        if ($barcode_id !== null && !is_numeric($barcode_id)) {
+            return response()->json(['error' => 'Barcode ID must be a valid number.'], 400);
         }
-    
-        // Return JSON response
+
+        if ($jarak !== null && !is_numeric($jarak)) {
+            return response()->json(['error' => 'Jarak must be a valid number.'], 400);
+        }
+
+        // Get all id_toko where barcode_id matches
+        $id_tokos = DB::table('product_price')
+            ->where('barcode_id', $barcode_id)
+            ->pluck('id_toko');
+
+        if ($id_tokos->isEmpty()) {
+            return response()->json(['error' => 'No stores found for the given Barcode ID.'], 404);
+        }
+
         return response()->json([
-            'barcode_id' => $barcode_id,
+            'id_tokos' => $id_tokos,
             'jarak' => $jarak,
         ]);
     }
