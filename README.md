@@ -18,7 +18,7 @@
 ### Guide to Install
 1. Clone the repo
   ```git
-    git clone https://github.com/Dhaboav/product-maps.git
+    git clone https://github.com/Dhaboav/GeoAI-Maps.git
   ```
 
 2. Navigate into project directory
