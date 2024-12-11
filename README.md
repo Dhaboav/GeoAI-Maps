@@ -33,7 +33,7 @@
 
 4. Set up .env
   ```cmd
-    copy .env.example .env;
+    copy .env.example .env
   ``` 
 
 5. Configure the database and google API key
