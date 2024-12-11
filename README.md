@@ -23,7 +23,7 @@
 
 2. Navigate into project directory
   ```cmd
-    cd product-maps;
+    cd GeoAI-Maps;
   ```
 
 3. Install Dependencies
